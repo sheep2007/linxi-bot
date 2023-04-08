@@ -18,7 +18,7 @@ from .utils import node_custom, get_member_name
 from .config import Config
 
 __plugin_meta__ = PluginMetadata(
-    name="who_at_me",
+    name="谁艾特我",
     description="看看是谁又艾特了我",
     usage="直接发送 谁@我了？",
     extra={

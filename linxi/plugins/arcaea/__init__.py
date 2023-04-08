@@ -16,7 +16,7 @@ from .handler import (
 from nonebot.plugin import PluginMetadata
 
 __plugin_meta__ = PluginMetadata(
-    name="Arcaea 查分",
+    name="Arcaea",
     description="Arcaea查分插件",
     usage="使用 /arc help查看使用帮助",
     extra={
