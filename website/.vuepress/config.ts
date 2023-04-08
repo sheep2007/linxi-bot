@@ -11,8 +11,8 @@ export default defineUserConfig({
     author: "mute.",
     authorAvatar: "/head.png",
     docsRepo: "https://github.com/mute23-code/linxi-bot",
-    docsBranch: "website",
-    docsDir: "",
+    docsBranch: "master",
+    docsDir: "website",
     lastUpdatedText: "",
     // series 为原 sidebar
     series: {
@@ -123,7 +123,7 @@ export default defineUserConfig({
           children: [
             {
               text: "打赏",
-              link: "/docs/others/donate.html",
+              link: "https://afdian.net/a/linxi-bot",
             },
           ],
         },
