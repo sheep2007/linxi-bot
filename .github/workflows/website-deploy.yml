@@ -1,9 +1,11 @@
-name: Development workflow
+name: Site Deploy
 
 on:
   push:
     branches:
       - master
+    paths:
+      - 'website/'
 
 jobs:
   deploy:
