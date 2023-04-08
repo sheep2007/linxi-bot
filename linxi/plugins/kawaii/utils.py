@@ -15,8 +15,7 @@ except ModuleNotFoundError:
     import json
 
 
-Bot_MASTER: str = list(nonebot.get_driver().config.superusers)[
-    0]      # bot的主人名称,也可以换成你自己的
+Bot_MASTER: str = list(nonebot.get_driver().config.superusers)[0]  # bot的主人名称,也可以换成你自己的
 
 path = TEXT_PATH / "kawaii"
 
@@ -45,8 +44,7 @@ for i in lst:
 LeafThesaurus = json.load(open(Path(path) / "leaf.json", "r", encoding="utf8"))
 
 # 载入词库(这个词库有点涩)
-AnimeThesaurus = json.load(
-    open(Path(path) / "data.json", "r", encoding="utf8"))
+AnimeThesaurus = json.load(open(Path(path) / "data.json", "r", encoding="utf8"))
 
 
 # 向bot打招呼
@@ -70,7 +68,7 @@ hello__reply = [
     f"喵呜 ~ ，叫{NICKNAME}做什么呢☆",
     "怎么啦qwq",
     "呜喵 ~ ，干嘛喵？",
-    "呼喵 ~ 叫可爱的咱有什么事嘛OvO"
+    "呼喵 ~ 叫可爱的咱有什么事嘛OvO",
 ]
 
 # 戳一戳消息
@@ -129,22 +127,22 @@ def get_chat_result(resource: dict, text: str) -> str:
 
 
 def is_CQ_Code(msg: str) -> bool:
-    '''
+    """
     判断参数是否为CQ码
-    '''
-    if len(msg) > 4 and msg[0] == '[' and msg[1:4] == "CQ:" and msg[-1] == ']':
+    """
+    if len(msg) > 4 and msg[0] == "[" and msg[1:4] == "CQ:" and msg[-1] == "]":
         return True
     else:
         return False
 
 
 def messagePreprocess(msg: Message):
-    '''
+    """
     对CQ码返回文件名（主要是处理CQ:image）
-    '''
+    """
     msg = str(msg)
     if is_CQ_Code(msg):
-        data = msg.split(',')
+        data = msg.split(",")
         for x in data:
             if "file=" in x:
                 return x

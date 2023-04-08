@@ -42,7 +42,7 @@ EXPIRE_SEC = int(cfg.gacha_expire_sec) if hasattr(cfg, "gacha_expire_sec") else 
 LOCAL_DIR = (
     (Path(cfg.resources_dir) / "gachalogs")
     if hasattr(cfg, "resources_dir")
-    else (Path() / "data" / "genshin" /"gachalogs")
+    else (Path() / "data" / "genshin" / "gachalogs")
 )
 if not LOCAL_DIR.exists():
     LOCAL_DIR.mkdir(parents=True, exist_ok=True)

@@ -10,7 +10,9 @@ from nonebot_plugin_guild_patch import Message, GuildMessageEvent
 from nonebot.params import CommandArg
 
 
-async def pre_handler(event: MessageEvent | GuildMessageEvent, arg: Message = CommandArg()):
+async def pre_handler(
+    event: MessageEvent | GuildMessageEvent, arg: Message = CommandArg()
+):
     args = arg.extract_plain_text().split()
     aua_token = config.get_config("aua_token")
     aua_url = config.get_config("aua_url")

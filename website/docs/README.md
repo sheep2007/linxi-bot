@@ -7,7 +7,7 @@ date: 2023-03-04
 
 > 适用版本号：v0.8.0
 
-本文档将指引您如何获取并使用 林汐。  
+本文档将指引您如何获取并使用 林汐。
 **林汐** 为对外公开的昵称，本文档其它部分将使用此昵称。
 
 
@@ -15,10 +15,10 @@ date: 2023-03-04
 
 ![qq-online](https://img.shields.io/badge/qq-online-brightgreen)
 
-你可以在QQ中使用。  
+你可以在QQ中使用。
 
 
-<!-- 
+<!--
 ### <a href="./obtain/wechat/index.html" title="QQ" style="text-decoration:none;">WeChat</a>
 敬请期待 -->
 
@@ -41,4 +41,3 @@ date: 2023-03-04
 
 ### [常见问题](faq.md)
 一些使用时出现问题的解决方案。
-

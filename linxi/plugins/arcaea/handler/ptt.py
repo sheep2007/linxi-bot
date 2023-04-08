@@ -7,7 +7,9 @@ from nonebot_plugin_guild_patch import Message, GuildMessageEvent
 from nonebot.params import CommandArg
 
 
-async def ptt_handler(event: MessageEvent | GuildMessageEvent, arg: Message = CommandArg()):
+async def ptt_handler(
+    event: MessageEvent | GuildMessageEvent, arg: Message = CommandArg()
+):
     args = arg.extract_plain_text().split()
     if args[0] == "ptt":
         user_info: UserInfo = UserInfo.get_or_none(UserInfo.user_qq == event.user_id)

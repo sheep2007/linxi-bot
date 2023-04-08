@@ -19,11 +19,11 @@ export default defineUserConfig({
       '/blogs/about/': [
         'introduce.md',
         'about',
-        'contribute'  
+        'contribute'
       ],
       '/docs/module/bilibili/': [
         "base.md",
-        "action",  
+        "action",
         "follow_up",
         "anchor",
         "anime",

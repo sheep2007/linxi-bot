@@ -20,11 +20,22 @@ from . import (
     particular_e_notice,
     requests,
     request_manual,
-    utils
+    utils,
 )
 from .config import global_config
 from .path import *
-from .utils import At, Reply, MsgText, banSb, change_s_title, log_sd, fi, log_fi, sd, init
+from .utils import (
+    At,
+    Reply,
+    MsgText,
+    banSb,
+    change_s_title,
+    log_sd,
+    fi,
+    log_fi,
+    sd,
+    init,
+)
 
 from . import blacklist
 from . import welcome
@@ -35,7 +46,7 @@ driver = nonebot.get_driver()
 
 @driver.on_bot_connect
 async def _():
-    await init() 
+    await init()
 
 
 """
@@ -55,7 +66,7 @@ __usage__ = """
     禁 @某人 0 可解禁
     解 @某人
   全群禁言
-    全员禁言 
+    全员禁言
     全员禁言 解
   踢出：
     踢 @某人
@@ -94,14 +105,11 @@ __usage__ = """
   Tips：可以通过 [at] 来确认是否艾特新成员
 
 """
-__help_plugin_name__ = '简易群管'
+__help_plugin_name__ = "简易群管"
 
 __plugin_meta__ = PluginMetadata(
     name="群管",
     description="群管理",
     usage=__usage__,
-    extra={
-        "unique_name": "manage",
-        "example": "无"
-    }
+    extra={"unique_name": "manage", "example": "无"},
 )

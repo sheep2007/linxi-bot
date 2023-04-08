@@ -10,7 +10,12 @@ import json
 import re
 
 from nonebot import on_command, on_request, logger
-from nonebot.adapters.onebot.v11 import Bot, GroupMessageEvent, GroupRequestEvent, MessageEvent
+from nonebot.adapters.onebot.v11 import (
+    Bot,
+    GroupMessageEvent,
+    GroupRequestEvent,
+    MessageEvent,
+)
 from nonebot.adapters.onebot.v11.permission import GROUP_ADMIN, GROUP_OWNER
 from nonebot.permission import SUPERUSER
 from nonebot.typing import T_State
@@ -25,20 +30,28 @@ from .utils import json_load
 su = global_config.superusers
 
 # 查看所有审批词条
-super_sp = on_command('审批词条', aliases={'所有审批', '所有词条'}, priority=1, block=True, permission=SUPERUSER)
+super_sp = on_command(
+    "审批词条", aliases={"所有审批", "所有词条"}, priority=1, block=True, permission=SUPERUSER
+)
 
 
 @super_sp.handle()
 async def _(bot: Bot, event: MessageEvent):
     answers = json_load(config_admin)
-    rely = ''
+    rely = ""
     for i in answers:
-        rely += i + ' : ' + str(answers[i]) + '\n'
+        rely += i + " : " + str(answers[i]) + "\n"
     await super_sp.finish(rely)
 
 
 # 按群号添加词条
-super_sp_add = on_command('指定词条+', aliases={'添加指定词条', '增加指定词条', '指定审批+', 'ssp+'}, priority=1, block=True, permission=SUPERUSER)
+super_sp_add = on_command(
+    "指定词条+",
+    aliases={"添加指定词条", "增加指定词条", "指定审批+", "ssp+"},
+    priority=1,
+    block=True,
+    permission=SUPERUSER,
+)
 
 
 @super_sp_add.handle()
@@ -56,13 +69,19 @@ async def _(bot: Bot, event: MessageEvent):
             else:
                 await super_sp_add.finish(f"{answer} 已存在于群{gid}的词条中")
         else:
-            await super_sp_de.finish('输入有误 /sp+ [群号] [词条]')
+            await super_sp_de.finish("输入有误 /sp+ [群号] [词条]")
     else:
-        await super_sp_de.finish('输入有误 /sp+ [群号] [词条]')
+        await super_sp_de.finish("输入有误 /sp+ [群号] [词条]")
 
 
 # 按群号删除词条
-super_sp_de = on_command('指定词条-', aliases={'删除指定词条', 'ssp-', '指定审批-'}, priority=1, block=True, permission=SUPERUSER)
+super_sp_de = on_command(
+    "指定词条-",
+    aliases={"删除指定词条", "ssp-", "指定审批-"},
+    priority=1,
+    block=True,
+    permission=SUPERUSER,
+)
 
 
 @super_sp_de.handle()
@@ -80,13 +99,18 @@ async def _(bot: Bot, event: MessageEvent):
             elif sp_delete is None:
                 await super_sp_de.finish(f"群{gid}从未配置过词条")
         else:
-            await super_sp_de.finish('输入有误 /ssp- [群号] [词条]')
+            await super_sp_de.finish("输入有误 /ssp- [群号] [词条]")
     else:
-        await super_sp_de.finish('输入有误 /ssp- [群号] [词条]')
+        await super_sp_de.finish("输入有误 /ssp- [群号] [词条]")
 
 
-check = on_command('查看词条', aliases={'审批'}, priority=1, block=True,
-                    permission=GROUP_ADMIN | GROUP_OWNER | SUPERUSER)
+check = on_command(
+    "查看词条",
+    aliases={"审批"},
+    priority=1,
+    block=True,
+    permission=GROUP_ADMIN | GROUP_OWNER | SUPERUSER,
+)
 
 
 @check.handle()
@@ -99,11 +123,16 @@ async def _(bot: Bot, event: GroupMessageEvent):
     if gid in a_config:
         this_config = a_config[gid]
         await check.finish(f"当前群审批词条：{this_config}")
-    await check.finish('当前群从未配置过审批词条')
+    await check.finish("当前群从未配置过审批词条")
 
 
-config = on_command('词条+', aliases={'sp+', '审批+', '添加词条', '增加词条'}, priority=1, block=True,
-                    permission=GROUP_ADMIN | GROUP_OWNER | SUPERUSER)
+config = on_command(
+    "词条+",
+    aliases={"sp+", "审批+", "添加词条", "增加词条"},
+    priority=1,
+    block=True,
+    permission=GROUP_ADMIN | GROUP_OWNER | SUPERUSER,
+)
 
 
 @config.handle()
@@ -111,7 +140,7 @@ async def _(bot: Bot, event: GroupMessageEvent, state: T_State):
     """
     /sp+ 增加本群词条
     """
-    msg = str(state['_prefix']['command_arg'])
+    msg = str(state["_prefix"]["command_arg"])
     sp_write = await approve.write(str(event.group_id), msg)
     gid = str(event.group_id)
     if sp_write:
@@ -119,8 +148,13 @@ async def _(bot: Bot, event: GroupMessageEvent, state: T_State):
     await config.finish(f"{msg} 已存在于群{gid}的词条中")
 
 
-config_ = on_command('词条-', aliases={'sp-', '审批-', '删除词条'}, priority=1, block=True,
-                     permission=GROUP_ADMIN | GROUP_OWNER | SUPERUSER)
+config_ = on_command(
+    "词条-",
+    aliases={"sp-", "审批-", "删除词条"},
+    priority=1,
+    block=True,
+    permission=GROUP_ADMIN | GROUP_OWNER | SUPERUSER,
+)
 
 
 @config_.handle()
@@ -128,7 +162,7 @@ async def _(bot: Bot, event: GroupMessageEvent, state: T_State):
     """
     /sp- 删除本群某词条
     """
-    msg = str(state['_prefix']['command_arg'])
+    msg = str(state["_prefix"]["command_arg"])
     gid = str(event.group_id)
     sp_delete = await approve.delete(gid, msg)
     if sp_delete:
@@ -147,12 +181,12 @@ group_req = on_request(priority=1, block=True)
 async def gr_(bot: Bot, event: GroupRequestEvent):
     raw = json.loads(event.json())
     gid = str(event.group_id)
-    flag = raw['flag']
-    logger.info('flag:', str(flag))
-    sub_type = raw['sub_type']
-    if sub_type == 'add':
-        comment = raw['comment']
-        word = re.findall(re.compile('答案：(.*)'), comment)
+    flag = raw["flag"]
+    logger.info("flag:", str(flag))
+    sub_type = raw["sub_type"]
+    if sub_type == "add":
+        comment = raw["comment"]
+        word = re.findall(re.compile("答案：(.*)"), comment)
         word = word[0] if word else comment
         compared = await verify(word, gid)
         uid = event.user_id
@@ -162,16 +196,22 @@ async def gr_(bot: Bot, event: GroupRequestEvent):
                 flag=flag,
                 sub_type=sub_type,
                 approve=True,
-                reason=' ',
+                reason=" ",
             )
             admins = g_admin()
-            if admins['su'] == 'True':
+            if admins["su"] == "True":
                 for q in su:
-                    await bot.send_msg(user_id=int(q), message=f"同意{uid}加入群 {gid},验证消息为 “{word}”")
+                    await bot.send_msg(
+                        user_id=int(q), message=f"同意{uid}加入群 {gid},验证消息为 “{word}”"
+                    )
             if gid in admins:
                 for q in admins[gid]:
-                    await bot.send_msg(message_type='private', user_id=q, group_id=int(gid),
-                                       message=f"同意{uid}加入群 {gid},验证消息为 “{word}”")
+                    await bot.send_msg(
+                        message_type="private",
+                        user_id=q,
+                        group_id=int(gid),
+                        message=f"同意{uid}加入群 {gid},验证消息为 “{word}”",
+                    )
 
         elif compared is False:
             logger.info(f"拒绝{uid}加入群 {gid},验证消息为 “{word}”")
@@ -179,15 +219,21 @@ async def gr_(bot: Bot, event: GroupRequestEvent):
                 flag=flag,
                 sub_type=sub_type,
                 approve=False,
-                reason='答案未通过群管验证，可修改答案后再次申请',
+                reason="答案未通过群管验证，可修改答案后再次申请",
             )
             admins = json_load(config_group_admin)
-            if admins['su'] == 'True':
+            if admins["su"] == "True":
                 for q in su:
-                    await bot.send_msg(user_id=int(q), message=f"拒绝{uid}加入群 {gid},验证消息为 “{word}”")
+                    await bot.send_msg(
+                        user_id=int(q), message=f"拒绝{uid}加入群 {gid},验证消息为 “{word}”"
+                    )
             if gid in admins:
                 for q in admins[gid]:
-                    await bot.send_msg(message_type='private', user_id=q, group_id=int(gid),
-                                       message=f"拒绝{uid}加入群 {gid},验证消息为 “{word}”")
+                    await bot.send_msg(
+                        message_type="private",
+                        user_id=q,
+                        group_id=int(gid),
+                        message=f"拒绝{uid}加入群 {gid},验证消息为 “{word}”",
+                    )
         elif compared is None:
             await group_req.finish()

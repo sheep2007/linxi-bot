@@ -19,5 +19,6 @@ async def _deputy_admin(event: GroupMessageEvent) -> bool:
     if admins.get(gid):
         return event.user_id in admins[gid]
 
+
 DEPUTY_ADMIN: Permission = Permission(_deputy_admin)
 """匹配分管事件"""

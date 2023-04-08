@@ -9,7 +9,9 @@ from ..schema import diffstr2num
 from ..config import UserUIConfig
 
 
-async def info_handler(event: MessageEvent | GuildMessageEvent, arg: Message = CommandArg()):
+async def info_handler(
+    event: MessageEvent | GuildMessageEvent, arg: Message = CommandArg()
+):
     args = arg.extract_plain_text().split()
     if args[0] == "info":
         if len(args) == 1:

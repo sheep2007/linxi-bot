@@ -9,21 +9,22 @@ import asyncio
 from datetime import datetime
 
 from nonebot.adapters.onebot.v11 import (
-    Bot, Event, PokeNotifyEvent,
+    Bot,
+    Event,
+    PokeNotifyEvent,
     HonorNotifyEvent,
     GroupUploadNoticeEvent,
     GroupDecreaseNoticeEvent,
     GroupIncreaseNoticeEvent,
     GroupAdminNoticeEvent,
     LuckyKingNotifyEvent,
-    MessageSegment
+    MessageSegment,
 )
 from nonebot.matcher import Matcher
 from nonebot.plugin import on_notice
 from nonebot.typing import T_State
 
 from .utils import fi
-
 
 
 # 获取群荣誉变更
@@ -58,7 +59,6 @@ admin_change = on_notice(_is_admin_change, priority=50, block=True)
 red_packet = on_notice(_is_red_packet, priority=50, block=True)
 
 
-
 @honor.handle()
 async def _(bot: Bot, event: HonorNotifyEvent, state: T_State, matcher: Matcher):
     honor_type = event.honor_type
@@ -86,10 +86,14 @@ async def _(bot: Bot, event: GroupUploadNoticeEvent, state: T_State, matcher: Ma
 
 
 @user_decrease.handle()
-async def _(bot: Bot, event: GroupDecreaseNoticeEvent, state: T_State, matcher: Matcher):
-    op = await bot.get_group_member_info(group_id=event.group_id, user_id=event.operator_id)
+async def _(
+    bot: Bot, event: GroupDecreaseNoticeEvent, state: T_State, matcher: Matcher
+):
+    op = await bot.get_group_member_info(
+        group_id=event.group_id, user_id=event.operator_id
+    )
     casualty_name = (await bot.get_stranger_info(user_id=event.user_id)).get("nickname")
-    op_name = op['card'] if op.get('card') else op['nickname']
+    op_name = op["card"] if op.get("card") else op["nickname"]
     e_time = datetime.fromtimestamp(event.time).strftime("%Y-%m-%d %H:%M:%S")
     avatar = get_avatar(event.user_id)
     farewell_words = "感谢/o给/n送上的飞机，谢谢/o"
@@ -103,15 +107,13 @@ async def _(bot: Bot, event: GroupDecreaseNoticeEvent, state: T_State, matcher: 
     await fi(matcher, reply)
 
 
-
-
 @admin_change.handle()
 async def _(bot: Bot, event: GroupAdminNoticeEvent, state: T_State, matcher: Matcher):
     reply = ""
     sub_type = event.sub_type
     uid = event.user_id
     user = await bot.get_group_member_info(group_id=event.group_id, user_id=uid)
-    u_name = user['card'] if user.get('card') else user['nickname']
+    u_name = user["card"] if user.get("card") else user["nickname"]
     cong_words = "恭喜/n成为管理"
     re_words = "Ops! /n不再是本群管理"
     if uid == bot.self_id:

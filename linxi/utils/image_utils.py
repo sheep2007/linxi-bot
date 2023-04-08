@@ -77,8 +77,7 @@ def compressed_image(
     """
     in_file = IMAGE_PATH / in_file if isinstance(in_file, str) else in_file
     if out_file:
-        out_file = IMAGE_PATH / \
-            out_file if isinstance(out_file, str) else out_file
+        out_file = IMAGE_PATH / out_file if isinstance(out_file, str) else out_file
     else:
         out_file = in_file
     h, w, d = cv2.imread(str(in_file.absolute())).shape
@@ -159,8 +158,7 @@ class BuildImage:
         h: int,
         paste_image_width: int = 0,
         paste_image_height: int = 0,
-        color: Union[str, Tuple[int, int, int],
-                     Tuple[int, int, int, int]] = None,
+        color: Union[str, Tuple[int, int, int], Tuple[int, int, int, int]] = None,
         image_mode: ModeType = "RGBA",
         font_size: int = 10,
         background: Union[Optional[str], BytesIO, Path] = None,
@@ -263,8 +261,7 @@ class BuildImage:
         img: "BuildImage" or Image,
         pos: Tuple[int, int] = None,
         alpha: bool = False,
-        center_type: Optional[Literal["center",
-                                      "by_height", "by_width"]] = None,
+        center_type: Optional[Literal["center", "by_height", "by_width"]] = None,
     ):
         """
         说明:
@@ -282,8 +279,7 @@ class BuildImage:
         img: "BuildImage" or Image,
         pos: Tuple[int, int] = None,
         alpha: bool = False,
-        center_type: Optional[Literal["center",
-                                      "by_height", "by_width"]] = None,
+        center_type: Optional[Literal["center", "by_height", "by_width"]] = None,
     ):
         """
         说明:
@@ -414,8 +410,7 @@ class BuildImage:
         pos: Union[Tuple[int, int], Tuple[float, float]],
         text: str,
         fill: Union[str, Tuple[int, int, int]] = (0, 0, 0),
-        center_type: Optional[Literal["center",
-                                      "by_height", "by_width"]] = None,
+        center_type: Optional[Literal["center", "by_height", "by_width"]] = None,
         font: Union[FreeTypeFont, str] = None,
         font_size: Optional[int] = None,
         **kwargs,
@@ -440,8 +435,7 @@ class BuildImage:
         pos: Union[Tuple[int, int], Tuple[float, float]],
         text: str,
         fill: Union[str, Tuple[int, int, int]] = (0, 0, 0),
-        center_type: Optional[Literal["center",
-                                      "by_height", "by_width"]] = None,
+        center_type: Optional[Literal["center", "by_height", "by_width"]] = None,
         font: Union[FreeTypeFont, str] = None,
         font_size: Optional[int] = None,
         **kwargs,
@@ -741,10 +735,8 @@ class BuildImage:
         )
         draw = ImageDraw.Draw(mask)
         for offset, fill in (width / -2.0, "black"), (width / 2.0, "white"):
-            left, top = [(value + offset) *
-                         antialias for value in ellipse_box[:2]]
-            right, bottom = [(value - offset) *
-                             antialias for value in ellipse_box[2:]]
+            left, top = [(value + offset) * antialias for value in ellipse_box[:2]]
+            right, bottom = [(value - offset) * antialias for value in ellipse_box[2:]]
             draw.ellipse([left, top, right, bottom], fill=fill)
         mask = mask.resize(self.markImg.size, Image.LANCZOS)
         try:
@@ -755,8 +747,7 @@ class BuildImage:
     async def acircle_corner(
         self,
         radii: int = 30,
-        point_list: List[Literal["lt", "rt", "lb", "rb"]] = [
-            "lt", "rt", "lb", "rb"],
+        point_list: List[Literal["lt", "rt", "lb", "rb"]] = ["lt", "rt", "lb", "rb"],
     ):
         """
         说明:
@@ -770,8 +761,7 @@ class BuildImage:
     def circle_corner(
         self,
         radii: int = 30,
-        point_list: List[Literal["lt", "rt", "lb", "rb"]] = [
-            "lt", "rt", "lb", "rb"],
+        point_list: List[Literal["lt", "rt", "lb", "rb"]] = ["lt", "rt", "lb", "rb"],
     ):
         """
         说明:
@@ -790,11 +780,9 @@ class BuildImage:
         if "lt" in point_list:
             alpha.paste(circle.crop((0, 0, radii, radii)), (0, 0))
         if "rt" in point_list:
-            alpha.paste(circle.crop(
-                (radii, 0, radii * 2, radii)), (w - radii, 0))
+            alpha.paste(circle.crop((radii, 0, radii * 2, radii)), (w - radii, 0))
         if "lb" in point_list:
-            alpha.paste(circle.crop(
-                (0, radii, radii, radii * 2)), (0, h - radii))
+            alpha.paste(circle.crop((0, radii, radii, radii * 2)), (0, h - radii))
         if "rb" in point_list:
             alpha.paste(
                 circle.crop((radii, radii, radii * 2, radii * 2)),
@@ -1057,8 +1045,7 @@ class BuildMat:
         elif self.mat_type == "bar":
             self._gen_bar_graph(y=self.y, display_num=self.display_num)
         elif self.mat_type == "barh":
-            self._gen_bar_graph(
-                y=self.y, display_num=self.display_num, is_barh=True)
+            self._gen_bar_graph(y=self.y, display_num=self.display_num, is_barh=True)
 
     def set_y(self, y: List[int]):
         """
@@ -1185,8 +1172,7 @@ class BuildMat:
                 self.markImg.text(
                     (
                         current_w - w,
-                        current_h - int(y[i] * self._p *
-                                        self._deviation) - 25 - 5,
+                        current_h - int(y[i] * self._p * self._deviation) - 25 - 5,
                     ),
                     f"{y[i]:.2f}" if isinstance(y[i], float) else f"{y[i]}",
                 )
@@ -1246,19 +1232,16 @@ class BuildMat:
                             + 5,
                             current_h - int(font_h / 2) - 1,
                         ),
-                        f"{y[i]:.2f}" if isinstance(
-                            y[i], float) else f"{y[i]}",
+                        f"{y[i]:.2f}" if isinstance(y[i], float) else f"{y[i]}",
                     )
                 else:
                     w = int(self.markImg.getsize(str(y[i]))[0] / 2)
                     self.markImg.text(
                         (
                             current_w - w,
-                            current_h - int(y[i] * self._p *
-                                            self._deviation) - 25,
+                            current_h - int(y[i] * self._p * self._deviation) - 25,
                         ),
-                        f"{y[i]:.2f}" if isinstance(
-                            y[i], float) else f"{y[i]}",
+                        f"{y[i]:.2f}" if isinstance(y[i], float) else f"{y[i]}",
                     )
             if i != len(y):
                 bar_color = random.choice(self.bar_color)
@@ -1315,8 +1298,7 @@ class BuildMat:
         padding_w = self.padding_w
         padding_h = self.padding_h
         line_length = self.line_length
-        background = random.choice(
-            self.background) if self.background else None
+        background = random.choice(self.background) if self.background else None
         A = BuildImage(
             self.w, self.h, font_size=font_size, font=self.font, background=background
         )
@@ -1378,8 +1360,7 @@ class BuildMat:
                 font=self.font,
             )
             text.rotate(self.x_rotate, True)
-            A.paste(text, (current_w - w, padding_h +
-                    line_length + 10), alpha=True)
+            A.paste(text, (current_w - w, padding_h + line_length + 10), alpha=True)
             current_w += _interval
             x_rotate_height = text.h
         _interval = self._x_interval if self.mat_type == "barh" else self._y_interval
@@ -1429,8 +1410,7 @@ async def text2image(
     text: str,
     auto_parse: bool = True,
     font_size: int = 20,
-    color: Union[str, Tuple[int, int, int],
-                 Tuple[int, int, int, int]] = "white",
+    color: Union[str, Tuple[int, int, int], Tuple[int, int, int, int]] = "white",
     font: str = "CJGaoDeGuo.otf",
     font_color: Union[str, Tuple[int, int, int]] = "black",
     padding: Union[int, Tuple[int, int, int, int]] = 0,
@@ -1513,11 +1493,9 @@ async def text2image(
                     img_width += BuildImage(0, 0, font_size=font_size).getsize(
                         placeholder[3]
                     )[0]
-                _tmp_text = _tmp_text.replace(
-                    f"[placeholder_{_tmp_index}]", "")
+                _tmp_text = _tmp_text.replace(f"[placeholder_{_tmp_index}]", "")
                 _tmp_index += 1
-            img_width += BuildImage(0, 0,
-                                    font_size=font_size).getsize(_tmp_text)[0]
+            img_width += BuildImage(0, 0, font_size=font_size).getsize(_tmp_text)[0]
             # img_width += len(_tmp_text) * font_size
             # 开始画图
             A = BuildImage(
@@ -1528,11 +1506,9 @@ async def text2image(
             # 遍历占位符
             for _ in range(s.count("[placeholder_")):
                 if not s.startswith(f"[placeholder_{current_placeholder_index}]"):
-                    slice_ = s.split(
-                        f"[placeholder_{current_placeholder_index}]")
+                    slice_ = s.split(f"[placeholder_{current_placeholder_index}]")
                     await A.atext(
-                        (current_width, A.h - basic_font_h -
-                         1), slice_[0], font_color
+                        (current_width, A.h - basic_font_h - 1), slice_[0], font_color
                     )
                     current_width += A.getsize(slice_[0])[0]
                 placeholder = _data[current_placeholder_index]
@@ -1568,7 +1544,7 @@ async def text2image(
                 current_width += text_img.w
                 s = s[
                     s.index(f"[placeholder_{current_placeholder_index}]")
-                    + len(f"[placeholder_{current_placeholder_index}]"):
+                    + len(f"[placeholder_{current_placeholder_index}]") :
                 ]
                 current_placeholder_index += 1
             if s:

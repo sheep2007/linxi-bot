@@ -30,14 +30,15 @@ def trigger_rule():
     return Rule(*checkers)
 
 
-stat_matcher = on_command(
-    "林汐状态", aliases={"ping", "status"}, rule=trigger_rule()
-)
+stat_matcher = on_command("林汐状态", aliases={"ping", "status"}, rule=trigger_rule())
 
 
 @stat_matcher.handle()
 async def _(
-    bot: Bot, event: MessageEvent | GuildMessageEvent, matcher: Matcher, arg: Message = CommandArg()
+    bot: Bot,
+    event: MessageEvent | GuildMessageEvent,
+    matcher: Matcher,
+    arg: Message = CommandArg(),
 ):
     pic = None
 

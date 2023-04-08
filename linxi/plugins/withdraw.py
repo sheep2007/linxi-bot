@@ -9,10 +9,7 @@ __plugin_meta__ = PluginMetadata(
     name="消息撤回",
     description=f"撤回用户消息，需要 {NICKNAME} 拥有管理员权限",
     usage="回复需要撤回的消息并发送 /撤回",
-    extra={
-        "unique_name": "withdraw",
-        "example": "暂无"
-    }
+    extra={"unique_name": "withdraw", "example": "暂无"},
 )
 
 

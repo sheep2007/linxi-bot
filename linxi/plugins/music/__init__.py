@@ -15,10 +15,7 @@ __plugin_meta__ = PluginMetadata(
     name="点歌",
     description="点歌，支持qq、网易云等来源",
     usage="点歌/qq点歌/网易点歌/酷我点歌/酷狗点歌/咪咕点歌/b站点歌 <歌名>",
-    extra={
-        "unique_name": "music",
-        "example": "点歌 万古生香"
-    }
+    extra={"unique_name": "music", "example": "点歌 万古生香"},
 )
 
 

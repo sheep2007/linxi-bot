@@ -3,11 +3,22 @@ from random import choice, uniform
 import asyncio
 import time
 from typing import List, Tuple, Dict
-from .exception import BiliAPI404Error, BiliAPIRetCodeError, BiliConnectionError, BiliDatebaseError, BiliInvalidRoomId, BiliInvalidShortUrl, BiliNoLiveRoom, BiliStatusCodeError
+from .exception import (
+    BiliAPI404Error,
+    BiliAPIRetCodeError,
+    BiliConnectionError,
+    BiliDatebaseError,
+    BiliInvalidRoomId,
+    BiliInvalidShortUrl,
+    BiliNoLiveRoom,
+    BiliStatusCodeError,
+)
 from nonebot.log import logger
 
 __PLUGIN_NAME__ = "[Linxi-Bilibili~Client]"
-class BiliClient():
+
+
+class BiliClient:
     def __init__(self) -> None:
         self.__proxy_pool__ = [None]
         self.__retry_times__ = 3
@@ -61,7 +72,7 @@ class BiliClient():
             "Mozilla/5.0 (X11; NetBSD) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.116 Safari/537.36",
             "Mozilla/5.0 (X11; CrOS i686 3912.101.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.116 Safari/537.36",
             "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.60 Safari/537.17",
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1309.0 Safari/537.17"
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1309.0 Safari/537.17",
         ]
         self.__usable_ip_list__ = set()
 
@@ -77,7 +88,7 @@ class BiliClient():
             "get_telegram_info_by_season_id": "https://api.bilibili.com/pgc/view/web/season?season_id={}",
             "get_telegram_latest_episode": "https://api.bilibili.com/pgc/view/web/season?season_id={}",
             "get_dynamic_list_by_uid": "https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?host_mid={}&timezone_offset=-480",
-            "get_detail_dynamic_by_id": "https://t.bilibili.com/{}"
+            "get_detail_dynamic_by_id": "https://t.bilibili.com/{}",
         }
 
         self.__proxy_lock__ = asyncio.Lock()
@@ -88,21 +99,20 @@ class BiliClient():
         await self.update_proxy_pool()
         return self
 
-
     def __request_header__(self) -> httpx.Headers:
-        '''返回随机UA的header
+        """返回随机UA的header
 
         Returns:
             httpx.Headers: 返回header
-        '''
+        """
         headers = {
-            'User-Agent': choice(self.__ua_list__),
+            "User-Agent": choice(self.__ua_list__),
         }
         return httpx.Headers(headers)
 
-    
-    
-    async def get_latest_video(self, uid: str, last_udpate_time: int) -> Tuple[bool, str, str, int, str]:
+    async def get_latest_video(
+        self, uid: str, last_udpate_time: int
+    ) -> Tuple[bool, str, str, int, str]:
         """
         @description  :
         根据uid和时间戳, 返回元组，表示存在新视频或无新视频
@@ -119,7 +129,9 @@ class BiliClient():
             async with httpx.AsyncClient(headers=self.__request_header__()) as client:
                 await client.get(url=self.API["get_bili_cookie"])
                 time.sleep(uniform(2, 4))
-                response = await client.get(url=self.API["get_latest_video_by_uid"].format(uid))
+                response = await client.get(
+                    url=self.API["get_latest_video_by_uid"].format(uid)
+                )
         except Exception as e:
             raise BiliConnectionError(0, uid, e.args[0])
 
@@ -129,20 +141,24 @@ class BiliClient():
         response = response.json()
         if response["code"] != 0:
             raise BiliAPIRetCodeError(0, uid, response["code"], response["message"])
-        
-        #logger.debug(f'{__PLUGIN_NAME__}{json.dumps(response, ensure_ascii=False, indent=4)}')
-        
-        latest_video = response['data']['list']['vlist'][0] if len(response['data']['list']['vlist']) != 0 else {}
+
+        # logger.debug(f'{__PLUGIN_NAME__}{json.dumps(response, ensure_ascii=False, indent=4)}')
+
+        latest_video = (
+            response["data"]["list"]["vlist"][0]
+            if len(response["data"]["list"]["vlist"]) != 0
+            else {}
+        )
         post_time = latest_video.get("created", 0)
 
         if post_time > last_udpate_time:
             # 发现新视频
-            title = latest_video['title']
-            bvID = latest_video['bvid']
-            cover_url = latest_video['pic']
+            title = latest_video["title"]
+            bvID = latest_video["bvid"]
+            cover_url = latest_video["pic"]
             return (True, bvID, title, post_time, cover_url)
 
-        return (False, '', '', 0, '')
+        return (False, "", "", 0, "")
 
     async def init_up_info(self, uid: str) -> Tuple[str, int]:
         """
@@ -157,41 +173,53 @@ class BiliClient():
         [up主名字，最新视频的时间戳]
         -------
         """
-        
+
         async with httpx.AsyncClient(headers=self.__request_header__()) as client:
             try:
                 await client.get(self.API["get_bili_cookie"])
-                response1 = await client.get(url=self.API["get_user_info_by_uid"].format(uid))
+                response1 = await client.get(
+                    url=self.API["get_user_info_by_uid"].format(uid)
+                )
             except Exception as e:
                 raise BiliConnectionError(0, uid, e.args[0])
 
             if response1.status_code != 200:
-                raise  BiliStatusCodeError(0, uid, response1.status_code)
-    
+                raise BiliStatusCodeError(0, uid, response1.status_code)
+
             response1 = response1.json()
             if response1["code"] == -404:
                 raise BiliAPI404Error()
             elif response1["code"] != 0:
-                raise BiliAPIRetCodeError(0, uid, response1["code"], response1["message"])
-            
+                raise BiliAPIRetCodeError(
+                    0, uid, response1["code"], response1["message"]
+                )
+
             user_name = response1["data"]["name"]
             try:
-                response2 = await client.get(url=self.API["get_latest_video_by_uid"].format(uid))
+                response2 = await client.get(
+                    url=self.API["get_latest_video_by_uid"].format(uid)
+                )
             except Exception as e:
                 raise BiliConnectionError(0, uid, e.args[0])
 
             if response2.status_code != 200:
-                raise  BiliStatusCodeError(0, uid, response2.status_code)
-    
+                raise BiliStatusCodeError(0, uid, response2.status_code)
+
             response2 = response2.json()
             if response2["code"] != 0:
-                raise BiliAPIRetCodeError(0, uid, response2["code"], response2["message"])
-            
-            latest_video = response2['data']['list']['vlist'][0] if len(response2['data']['list']['vlist']) != 0 else {}
+                raise BiliAPIRetCodeError(
+                    0, uid, response2["code"], response2["message"]
+                )
+
+            latest_video = (
+                response2["data"]["list"]["vlist"][0]
+                if len(response2["data"]["list"]["vlist"]) != 0
+                else {}
+            )
             post_time = latest_video.get("created", 0)
 
             return (user_name, post_time)
-           
+
     async def get_live_status(self, uid: str, room_id: str) -> Tuple[bool, str, str]:
         """
         @description  :
@@ -206,30 +234,32 @@ class BiliClient():
         [是否正在直播，直播间标题，直播间封面链接]
         -------
         """
-        
+
         async with httpx.AsyncClient(headers=self.__request_header__()) as client:
             try:
                 await client.get(self.API["get_bili_cookie"])
-                response = await client.get(self.API["get_live_info_by_room_id"].format(room_id))
+                response = await client.get(
+                    self.API["get_live_info_by_room_id"].format(room_id)
+                )
             except Exception as e:
                 raise BiliConnectionError(1, uid, e.args[0])
-            
+
             if response.status_code != 200:
                 raise BiliStatusCodeError(1, uid, response.status_code)
-            
+
             response = response.json()
             if response["code"] != 0:
                 raise BiliAPIRetCodeError(1, uid, response["code"], response["message"])
-            
+
             live_status = response["data"]["live_status"]
             title = response["data"]["title"]
             cover_url = response["data"]["user_cover"]
-        
+
             if live_status == 1:
                 return (True, title, cover_url)
             else:
                 return (False, "", "")
-    
+
     async def init_liver_info(self, uid: str) -> Tuple[str, str]:
         """
         @description  :
@@ -247,44 +277,48 @@ class BiliClient():
         async with httpx.AsyncClient(headers=self.__request_header__()) as client:
             try:
                 await client.get(self.API["get_bili_cookie"])
-                response = await client.get(self.API["get_liver_info_by_uid"].format(uid))
+                response = await client.get(
+                    self.API["get_liver_info_by_uid"].format(uid)
+                )
             except Exception as e:
                 raise BiliConnectionError(0, uid, e.args[0])
-            
+
         if response.status_code != 200:
             raise BiliStatusCodeError(1, uid, response.status_code)
-        
+
         response = response.json()
         if response["code"] != 0:
             raise BiliAPIRetCodeError(1, uid, response["code"], response["message"])
-        
+
         liver_name = response["data"]["info"]["uname"]
         room_id = response["data"]["room_id"]
 
         if room_id == 0:
             raise BiliNoLiveRoom(liver_name)
-        
+
         return (liver_name, room_id)
-    
+
     async def init_liver_info_by_room_id(self, room_id: str) -> Tuple[str, str]:
-        '''根据直播房间号获得主播uid和主播用户名
+        """根据直播房间号获得主播uid和主播用户名
 
         Args:
             room_id (str): 直播房间号
 
         Returns:
-            Tuple[str, str]: 
+            Tuple[str, str]:
             返回一个元组
             [主播uid, 主播用户名]
-        '''
+        """
 
         async with httpx.AsyncClient(headers=self.__request_header__()) as client:
             try:
                 await client.get(url=self.API["get_bili_cookie"])
-                response1 = await client.get(url=self.API["get_live_info_by_room_id"].format(room_id))
+                response1 = await client.get(
+                    url=self.API["get_live_info_by_room_id"].format(room_id)
+                )
             except Exception as e:
                 raise BiliConnectionError(1, f"房间号:{room_id}", e.args[0])
-            
+
             if response1.status_code != 200:
                 raise BiliStatusCodeError(1, f"房间号:{room_id}", response1.status_code)
 
@@ -292,90 +326,108 @@ class BiliClient():
             if response1["code"] == 1:
                 raise BiliInvalidRoomId(room_id)
             if response1["code"] != 0:
-                raise BiliAPIRetCodeError(1, f"房间号:{room_id}", response1["code"], response1["message"])
-            
+                raise BiliAPIRetCodeError(
+                    1, f"房间号:{room_id}", response1["code"], response1["message"]
+                )
+
             uid = str(response1["data"]["uid"])
 
             try:
-                response2 = await client.get(self.API["get_liver_info_by_uid"].format(uid))
+                response2 = await client.get(
+                    self.API["get_liver_info_by_uid"].format(uid)
+                )
             except Exception as e:
                 raise BiliConnectionError(0, uid, e.args[0])
-            
+
             if response2.status_code != 200:
-                raise  BiliStatusCodeError(1, uid, response2.status_code)
-    
+                raise BiliStatusCodeError(1, uid, response2.status_code)
+
             response2 = response2.json()
             if response2["code"] != 0:
-                raise BiliAPIRetCodeError(1, uid, response2["code"], response2["message"])
-            
+                raise BiliAPIRetCodeError(
+                    1, uid, response2["code"], response2["message"]
+                )
+
             liver_name = response2["data"]["info"]["uname"]
 
             return (uid, liver_name)
-    
-    async def init_telegram_info_by_ep_id(self, ep_id: int) -> Tuple[int, str, int, bool]:
-        ''' 根据ep_id初始化番剧信息
+
+    async def init_telegram_info_by_ep_id(
+        self, ep_id: int
+    ) -> Tuple[int, str, int, bool]:
+        """根据ep_id初始化番剧信息
 
         Args:
             ep_id (int): ep_id
 
         Returns:
-            Tuple[int, str, int, bool]: 
+            Tuple[int, str, int, bool]:
             返回一个元组
             [season_id, 番剧名, 最新集, 是否完结]
-        '''
+        """
 
         async with httpx.AsyncClient(headers=self.__request_header__()) as client:
             try:
                 await client.get(url=self.API["get_bili_cookie"])
-                response = await client.get(url=self.API["get_telegram_info_by_ep_id"].format(ep_id))
+                response = await client.get(
+                    url=self.API["get_telegram_info_by_ep_id"].format(ep_id)
+                )
             except Exception as e:
                 raise BiliConnectionError(2, f"ep_id:{ep_id}", e.args[0])
-            
+
             if response.status_code != 200:
                 raise BiliStatusCodeError(2, f"ep_id:{ep_id}", response.status_code)
-    
+
             response = response.json()
             if response["code"] == -404:
                 raise BiliAPI404Error()
             elif response["code"] != 0:
-                raise BiliAPIRetCodeError(2, f"ep_id:{ep_id}", response["code"], response["message"])
+                raise BiliAPIRetCodeError(
+                    2, f"ep_id:{ep_id}", response["code"], response["message"]
+                )
 
             season_id = response["result"]["season_id"]
             season_title = response["result"]["season_title"]
             is_finish = bool(response["result"]["publish"]["is_finish"])
             latest_episode = len(response["result"]["episodes"])
-    
-
 
             return (season_id, season_title, latest_episode, is_finish)
 
-    async def init_telegram_info_by_season_id(self, season_id: int) -> Tuple[int, str, int, bool]:
-        ''' 根据season_id初始化番剧信息
+    async def init_telegram_info_by_season_id(
+        self, season_id: int
+    ) -> Tuple[int, str, int, bool]:
+        """根据season_id初始化番剧信息
 
         Args:
             season_id (int): season_id
 
         Returns:
-            Tuple[int, str, int, bool]: 
+            Tuple[int, str, int, bool]:
             返回一个元组
             [season_id, 番剧名, 最新集, 是否完结]
-        '''
+        """
 
         async with httpx.AsyncClient(headers=self.__request_header__()) as client:
             try:
                 await client.get(url=self.API["get_bili_cookie"])
-                response = await client.get(url=self.API["get_telegram_info_by_season_id"].format(season_id))
+                response = await client.get(
+                    url=self.API["get_telegram_info_by_season_id"].format(season_id)
+                )
             except Exception as e:
                 raise BiliConnectionError(2, f"season_id:{season_id}", e.args[0])
-            
+
             if response.status_code != 200:
-                raise BiliStatusCodeError(2, f"season_id:{season_id}", response.status_code)
-    
+                raise BiliStatusCodeError(
+                    2, f"season_id:{season_id}", response.status_code
+                )
+
             response = response.json()
             if response["code"] == -404:
                 raise BiliAPI404Error()
             elif response["code"] != 0:
-                raise BiliAPIRetCodeError(2, f"season_id:{season_id}", response["code"], response["message"])
+                raise BiliAPIRetCodeError(
+                    2, f"season_id:{season_id}", response["code"], response["message"]
+                )
 
             season_title = response["result"]["title"]
             is_finish = bool(response["result"]["publish"]["is_finish"])
@@ -383,33 +435,41 @@ class BiliClient():
 
             return (season_id, season_title, latest_episode, is_finish)
 
-    async def init_telegram_info_by_media_id(self, media_id: int) -> Tuple[int, str, int, bool]:
-        ''' 根据media_id初始化番剧信息
+    async def init_telegram_info_by_media_id(
+        self, media_id: int
+    ) -> Tuple[int, str, int, bool]:
+        """根据media_id初始化番剧信息
 
         Args:
             media_id (int): media_id
 
         Returns:
-            Tuple[int, str, int, bool]: 
+            Tuple[int, str, int, bool]:
             返回一个元组
             [season_id, 番剧名, 最新集, 是否完结]
-        '''
+        """
 
         async with httpx.AsyncClient(headers=self.__request_header__()) as client:
             try:
                 await client.get(url=self.API["get_bili_cookie"])
-                response = await client.get(url=self.API["get_telegram_info_by_media_id"].format(media_id))
+                response = await client.get(
+                    url=self.API["get_telegram_info_by_media_id"].format(media_id)
+                )
             except Exception as e:
                 raise BiliConnectionError(2, f"media_id:{media_id}", e.args[0])
-            
+
             if response.status_code != 200:
-                raise BiliStatusCodeError(2, f"media_id:{media_id}", response.status_code)
-    
+                raise BiliStatusCodeError(
+                    2, f"media_id:{media_id}", response.status_code
+                )
+
             response = response.json()
             if response["code"] == -404:
                 raise BiliAPI404Error()
             elif response["code"] != 0:
-                raise BiliAPIRetCodeError(2, f"media_id:{media_id}", response["code"], response["message"])
+                raise BiliAPIRetCodeError(
+                    2, f"media_id:{media_id}", response["code"], response["message"]
+                )
 
             season_id = response["result"]["media"]["season_id"]
             season_title = response["result"]["media"]["title"]
@@ -417,68 +477,76 @@ class BiliClient():
             latest_episode = int(response["result"]["media"]["new_ep"]["index"])
 
             return (season_id, season_title, latest_episode, is_finish)
-    
-    async def get_telegram_latest_episode(self, season_id: int, index: int) -> Tuple[bool, int, str, str, str, bool]:
-        '''根据season_id获取番剧的最新集信息
+
+    async def get_telegram_latest_episode(
+        self, season_id: int, index: int
+    ) -> Tuple[bool, int, str, str, str, bool]:
+        """根据season_id获取番剧的最新集信息
 
         Args:
             season_id (int): season_id
             index (int): 记录的最新集数
 
         Returns:
-            Tuple[bool, int, str, str, str, bool]: 
+            Tuple[bool, int, str, str, str, bool]:
             返回一个元组
             [是否更新, 最新集数, 最新集标题, 最新集链接, 封面链接, 是否完结]
-        '''
+        """
 
         async with httpx.AsyncClient(headers=self.__request_header__()) as client:
             try:
                 await client.get(url=self.API["get_bili_cookie"])
-                response = await client.get(url=self.API["get_telegram_latest_episode"].format(season_id))
+                response = await client.get(
+                    url=self.API["get_telegram_latest_episode"].format(season_id)
+                )
             except Exception as e:
                 raise BiliConnectionError(2, f"season_id:{season_id}", e.args[0])
-            
+
             if response.status_code != 200:
-                raise BiliStatusCodeError(2, f"season_id:{season_id}", response.status_code)
-    
+                raise BiliStatusCodeError(
+                    2, f"season_id:{season_id}", response.status_code
+                )
+
             response = response.json()
             if response["code"] != 0:
-                raise BiliAPIRetCodeError(2, f"season_id:{season_id}", response["code"], response["message"])
+                raise BiliAPIRetCodeError(
+                    2, f"season_id:{season_id}", response["code"], response["message"]
+                )
 
-            episodes = response['result']['episodes']
+            episodes = response["result"]["episodes"]
             is_finish = bool(response["result"]["publish"]["is_finish"])
 
             if len(episodes) > index:
                 latest_episode = episodes[-1]
-                cover_url = latest_episode['cover']
-                title = latest_episode['long_title']
-                play_url = latest_episode['share_url']
-                
+                cover_url = latest_episode["cover"]
+                title = latest_episode["long_title"]
+                play_url = latest_episode["share_url"]
+
                 return (True, len(episodes), title, play_url, cover_url, is_finish)
             else:
                 return (False, 0, "", "", "", is_finish)
-    
+
     async def parse_short_url(self, short_url: str) -> Tuple[int, str]:
-        '''解析b23.tv的短链接,返回短链接类型以及目标id
+        """解析b23.tv的短链接,返回短链接类型以及目标id
 
         Args:
             short_url (str): 短链接
 
         Returns:
-            Tuple[int, str]: 
+            Tuple[int, str]:
             返回一个元组
             [类型:0-up的uid,1-主播的房间号,2-番剧的ep_id, 目标id]
-        '''
+        """
         async with httpx.AsyncClient(headers=self.__request_header__()) as client:
             try:
                 await client.get(url=self.API["get_bili_cookie"])
                 response = await client.get(url=short_url)
             except Exception as e:
                 raise BiliConnectionError(3, short_url, e.args[0])
-            
+
             if response.status_code != 302:
                 raise BiliStatusCodeError(3, short_url, response.status_code)
-            
+
             origin_url = response.headers["Location"].split("?")[0]
             logger.debug(f"get origin url = {origin_url}")
             target_id = origin_url.split("/")[-1]
@@ -488,7 +556,7 @@ class BiliClient():
                 return (1, target_id)
             elif "bangumi" in origin_url:
                 return (2, target_id)
-            
+
             raise BiliInvalidShortUrl(short_url)
 
     async def init_dynamic_info(self, uid: str) -> Tuple[str, str, int]:
@@ -504,60 +572,73 @@ class BiliClient():
         [动态主名字，置顶动态id, 最新动态的时间戳]
         -------
         """
-        
+
         async with httpx.AsyncClient(headers=self.__request_header__()) as client:
             try:
                 await client.get(self.API["get_bili_cookie"])
-                response1 = await client.get(url=self.API["get_user_info_by_uid"].format(uid))
+                response1 = await client.get(
+                    url=self.API["get_user_info_by_uid"].format(uid)
+                )
             except Exception as e:
                 raise BiliConnectionError(4, uid, e.args[0])
 
             if response1.status_code != 200:
-                raise  BiliStatusCodeError(4, uid, response1.status_code)
-    
+                raise BiliStatusCodeError(4, uid, response1.status_code)
+
             response1 = response1.json()
             if response1["code"] == -404:
                 raise BiliAPI404Error()
             elif response1["code"] != 0:
-                raise BiliAPIRetCodeError(3, uid, response1["code"], response1["message"])
-            
+                raise BiliAPIRetCodeError(
+                    3, uid, response1["code"], response1["message"]
+                )
+
             user_name = response1["data"]["name"]
 
             try:
-                response2 = await client.get(url=self.API["get_dynamic_list_by_uid"].format(uid))
+                response2 = await client.get(
+                    url=self.API["get_dynamic_list_by_uid"].format(uid)
+                )
             except Exception as e:
                 raise BiliConnectionError(4, uid, e.args[0])
 
             if response2.status_code != 200:
-                raise  BiliStatusCodeError(4, uid, response2.status_code)
-    
+                raise BiliStatusCodeError(4, uid, response2.status_code)
+
             response2 = response2.json()
             if response2["code"] != 0:
-                raise BiliAPIRetCodeError(3, uid, response2["code"], response2["message"])
-            
+                raise BiliAPIRetCodeError(
+                    3, uid, response2["code"], response2["message"]
+                )
+
         news_list: List = response2["data"]["items"]
 
         if len(news_list) == 0:
             return (user_name, "", 0)
-        
+
         top_news = news_list[0]
         top_news_id = ""
-        if "module_tag" in top_news["modules"] and top_news["modules"]["module_tag"]["text"] == "置顶":
+        if (
+            "module_tag" in top_news["modules"]
+            and top_news["modules"]["module_tag"]["text"] == "置顶"
+        ):
             # 如果存在置顶动态,判断与数据库中记录的是否相同
             top_news_id = top_news["id_str"]
             latest_timestamp = top_news["modules"]["module_author"]["pub_ts"]
 
             if len(news_list) == 1:
                 return (user_name, top_news_id, latest_timestamp)
-            
+
             latest_timestamp = news_list[1]["modules"]["module_author"]["pub_ts"]
             return (user_name, top_news_id, latest_timestamp)
         else:
             latest_timestamp = news_list[0]["modules"]["module_author"]["pub_ts"]
             return (user_name, "", latest_timestamp)
 
-    async def get_latest_dynamic(self, uid: str, pin_news_id: str, latest_timestamp: int) -> Tuple[bool, bool, str, List[Dict]]:
-        '''根据uid获取最新的动态
+    async def get_latest_dynamic(
+        self, uid: str, pin_news_id: str, latest_timestamp: int
+    ) -> Tuple[bool, bool, str, List[Dict]]:
+        """根据uid获取最新的动态
 
         Args:
             uid (str): 查询的uid
@@ -565,16 +646,18 @@ class BiliClient():
             latest_timestamp (int): 数据库中记录最新动态的时间戳
 
         Returns:
-            Tuple[bool, bool, str, Dict]: 
+            Tuple[bool, bool, str, Dict]:
             bool - 置顶动态是否更新
             bool - 是否有更新的动态
             str - 置顶动态id
             List[Dict] - 更新的动态内容
-        ''' 
+        """
         async with httpx.AsyncClient(headers=self.__request_header__()) as client:
             try:
                 await client.get(url=self.API["get_bili_cookie"])
-                response = await client.get(url=self.API["get_dynamic_list_by_uid"].format(uid))
+                response = await client.get(
+                    url=self.API["get_dynamic_list_by_uid"].format(uid)
+                )
             except Exception as e:
                 raise BiliConnectionError(4, f"uid:{uid}", e.args[0])
 
@@ -583,13 +666,13 @@ class BiliClient():
             response = response.json()
             if response["code"] != 0:
                 raise BiliAPIRetCodeError(3, uid, response["code"], response["message"])
-            
+
         news_list: List = response["data"]["items"]
 
         # 如果动态列表长度为0则直接返回
         if len(news_list) == 0:
             return (False, False, "", [])
-        
+
         update_news_list = []
         has_pin_news = 0
         top_news_change = False
@@ -597,25 +680,36 @@ class BiliClient():
 
         # 处理置顶动态
         top_news = news_list[0]
-        if "module_tag" in top_news["modules"] and top_news["modules"]["module_tag"]["text"] == "置顶":
+        if (
+            "module_tag" in top_news["modules"]
+            and top_news["modules"]["module_tag"]["text"] == "置顶"
+        ):
             # 如果存在置顶动态,判断与数据库中记录的是否相同
             has_pin_news = 1
             top_news_id: str = top_news["id_str"]
-            
+
             if top_news_id == pin_news_id:
                 # 如果相同,则跳过该动态
                 pass
             else:
                 # 如果置顶动态发生更换
                 # 处理置顶旧动态的情况,如果置顶旧动态,则不需要更新通知;
-                #logger.debug(f'{__PLUGIN_NAME__} <{uid}> 的置顶动态发生变化,由{pin_news_id}变为{top_news_id}')
+                # logger.debug(f'{__PLUGIN_NAME__} <{uid}> 的置顶动态发生变化,由{pin_news_id}变为{top_news_id}')
                 top_news_change = True
                 major_module: Dict = top_news["modules"]["module_dynamic"]["major"]
-                additional_module: Dict = top_news["modules"]["module_dynamic"]["additional"]
-                desc_module: Dict  = top_news["modules"]["module_dynamic"]["desc"]
+                additional_module: Dict = top_news["modules"]["module_dynamic"][
+                    "additional"
+                ]
+                desc_module: Dict = top_news["modules"]["module_dynamic"]["desc"]
                 top_news_timestamp: int = top_news["modules"]["module_author"]["pub_ts"]
-                top_news_major_type = major_module["type"] if major_module else "MAJOR_TYPE_NONE"
-                top_news_add_type = additional_module["type"] if additional_module else "ADDITIONAL_TYPE_NONE"
+                top_news_major_type = (
+                    major_module["type"] if major_module else "MAJOR_TYPE_NONE"
+                )
+                top_news_add_type = (
+                    additional_module["type"]
+                    if additional_module
+                    else "ADDITIONAL_TYPE_NONE"
+                )
 
                 if top_news_timestamp > latest_timestamp:
                     # 置顶动态是新动态,需要通知
@@ -636,44 +730,52 @@ class BiliClient():
                         temp_news["article"] = {
                             "title": major_module["article"]["title"],
                             "cover": major_module["article"]["covers"][0],
-                            "jump_url": major_module["article"]["jump_url"]
+                            "jump_url": major_module["article"]["jump_url"],
                         }
                     if top_news_add_type == "ADDITIONAL_TYPE_VOTE":
                         temp_news["tag"] = "ADD_VOTE"
                         temp_news["vote"] = {
                             "desc": additional_module["vote"]["desc"],
-                            "vote_id": additional_module["vote"]["vote_id"]
+                            "vote_id": additional_module["vote"]["vote_id"],
                         }
                     elif top_news_add_type == "ADDITIONAL_TYPE_UGC":
                         temp_news["tag"] = "ADD_UGC"
                         temp_news["tgc"] = {
-                            "title" : additional_module["ugc"]["title"],
+                            "title": additional_module["ugc"]["title"],
                             "jump_url": additional_module["ugc"]["jump_url"],
-                            "cover": additional_module["ugc"]["cover"]
+                            "cover": additional_module["ugc"]["cover"],
                         }
                     elif top_news_add_type == "ADDITIONAL_TYPE_RESERVE":
                         temp_news["tag"] = "ADD_RESERVE"
                         temp_news["reserve"] = {
                             "title": additional_module["reserve"]["title"],
-                            "desc": additional_module["reserve"]["desc1"]["text"]
+                            "desc": additional_module["reserve"]["desc1"]["text"],
                         }
-                        
+
                     update_news_list.append(temp_news)
-        
+
         # 处理置顶动态外的动态
         for news_item in news_list[has_pin_news:]:
             news_id = news_item["id_str"]
             major_module: Dict = news_item["modules"]["module_dynamic"]["major"]
-            additional_module: Dict = news_item["modules"]["module_dynamic"]["additional"]
-            desc_module: Dict  = news_item["modules"]["module_dynamic"]["desc"]
-            news_item_major_type = major_module["type"] if major_module else "MAJOR_TYPE_NONE"
-            news_item_add_type = additional_module["type"] if additional_module else "ADDITIONAL_TYPE_NONE"
+            additional_module: Dict = news_item["modules"]["module_dynamic"][
+                "additional"
+            ]
+            desc_module: Dict = news_item["modules"]["module_dynamic"]["desc"]
+            news_item_major_type = (
+                major_module["type"] if major_module else "MAJOR_TYPE_NONE"
+            )
+            news_item_add_type = (
+                additional_module["type"]
+                if additional_module
+                else "ADDITIONAL_TYPE_NONE"
+            )
             news_timestamp = news_item["modules"]["module_author"]["pub_ts"]
-            
+
             if news_timestamp <= latest_timestamp:
                 break
             # 发现新动态
-            logger.debug(f'{__PLUGIN_NAME__} <{uid}> 更新了动态 {news_id}')
+            logger.debug(f"{__PLUGIN_NAME__} <{uid}> 更新了动态 {news_id}")
             temp_news = {}
             temp_news["tag"] = "NORMAL"
             temp_news["news_id"] = news_id
@@ -691,59 +793,60 @@ class BiliClient():
                 temp_news["article"] = {
                     "title": major_module["article"]["title"],
                     "cover": major_module["article"]["covers"][0],
-                    "jump_url": major_module["article"]["jump_url"]
+                    "jump_url": major_module["article"]["jump_url"],
                 }
             if news_item_add_type == "ADDITIONAL_TYPE_VOTE":
                 temp_news["tag"] = "ADD_VOTE"
                 temp_news["vote"] = {
                     "desc": additional_module["vote"]["desc"],
-                    "vote_id": additional_module["vote"]["vote_id"]
+                    "vote_id": additional_module["vote"]["vote_id"],
                 }
             elif news_item_add_type == "ADDITIONAL_TYPE_UGC":
                 temp_news["tag"] = "ADD_UGC"
                 temp_news["tgc"] = {
-                    "title" : additional_module["ugc"]["title"],
+                    "title": additional_module["ugc"]["title"],
                     "jump_url": additional_module["ugc"]["jump_url"],
-                    "cover": additional_module["ugc"]["cover"]
+                    "cover": additional_module["ugc"]["cover"],
                 }
             elif news_item_add_type == "ADDITIONAL_TYPE_RESERVE":
                 temp_news["tag"] = "ADD_RESERVE"
                 temp_news["reserve"] = {
                     "title": additional_module["reserve"]["title"],
-                    "desc": additional_module["reserve"]["desc1"]["text"]
+                    "desc": additional_module["reserve"]["desc1"]["text"],
                 }
             elif news_item_add_type == "ADDITIONAL_TYPE_MATCH":
                 temp_news["tag"] = "ADD_MATCH"
                 temp_news["match"] = {
                     "match_title": additional_module["match"]["head_text"],
-                    "jump_url": additional_module["match"]["button"]["jump_url"]
+                    "jump_url": additional_module["match"]["button"]["jump_url"],
                 }
-                
+
             update_news_list.append(temp_news)
-                
-        return (top_news_change, bool(len(update_news_list)), top_news_id, update_news_list)
-    
+
+        return (
+            top_news_change,
+            bool(len(update_news_list)),
+            top_news_id,
+            update_news_list,
+        )
+
     def web_request(self, url: str) -> httpx.Response:
-        '''根据url进行网络访问
+        """根据url进行网络访问
 
         Args:
             url (str): 目标网站
 
         Returns:
             httpx.Response: 返回响应
-        '''
+        """
         with httpx.Client(headers=self.__request_header__()) as client:
             try:
                 response = client.get(url=url)
             except Exception as e:
-                logger.debug(f'出现网络连接错误:{e}')
+                logger.debug(f"出现网络连接错误:{e}")
                 return None
             else:
                 return response
-                
-            
 
 
-
-    
 bili_client = BiliClient()

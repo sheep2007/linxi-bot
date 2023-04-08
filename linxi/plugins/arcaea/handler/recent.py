@@ -7,7 +7,9 @@ from ..message.image_message import UserArcaeaInfo
 from ..matcher import arc
 
 
-async def recent_handler(event: MessageEvent | GuildMessageEvent, arg: Message = CommandArg()):
+async def recent_handler(
+    event: MessageEvent | GuildMessageEvent, arg: Message = CommandArg()
+):
     args = arg.extract_plain_text().split()
     if args[0] == "recent":
         user_info: UserInfo = UserInfo.get_or_none(UserInfo.user_qq == event.user_id)

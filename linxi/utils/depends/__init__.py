@@ -42,7 +42,6 @@ def ImageList(msg: Optional[str] = None, contain_reply: bool = True) -> List[str
     return Depends(dependency)
 
 
-
 def AtList(msg: Optional[str] = None, contain_reply: bool = True) -> List[int]:
     """
     说明:

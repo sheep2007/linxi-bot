@@ -26,10 +26,7 @@ __plugin_meta__ = PluginMetadata(
     name="对话超管",
     description=f"跨越时空与管理员对话",
     usage=__usage__,
-    extra={
-        "unique_name": "dialogue",
-        "example": "/对话超管 我喜欢你"
-    }
+    extra={"unique_name": "dialogue", "example": "/对话超管 我喜欢你"},
 )
 
 

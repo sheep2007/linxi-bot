@@ -6,7 +6,9 @@ from ..api.request import API
 from ..schema import diffstr2num
 
 
-async def preview_handler(event: MessageEvent | GuildMessageEvent, arg: Message = CommandArg()):
+async def preview_handler(
+    event: MessageEvent | GuildMessageEvent, arg: Message = CommandArg()
+):
     """
     /arc preview Fracture Ray ftr
     """

@@ -1,6 +1,6 @@
 ![linxi-bot](https://socialify.git.ci/mute23-code/linxi-bot/image?font=Rokkitt&forks=1&issues=1&language=1&logo=https%3A%2F%2Fraw.githubusercontent.com%2Fmute23-code%2Flinxi-bot%2Fmaster%2Fresources%2Fimage%2Flogo.jpg&owner=1&pattern=Circuit%20Board&pulls=1&stargazers=1&theme=Auto)
 
-# 👋 林汐bot 
+# 👋 林汐bot
 [![QQ群](https://img.shields.io/badge/QQ%E7%BE%A4-413820772-orange?style=flat-square)](https://qm.qq.com/cgi-bin/qm/qr?k=r_zdDUSc0jE8v71Mb6plhkFn82muySUF&jump_from=webapi&authKey=Bdtuu4olP1fDLLvR9Y2kseco3o1hrhD6qocoxLg+mQB86bborjIW7II/ecWSQbq9)
 [![QQ频道](https://img.shields.io/badge/QQ%E9%A2%91%E9%81%93-%E6%9E%97%E6%B1%90%E5%92%96%E5%95%A1%E5%B1%8B-5492ff?style=flat-square)](https://pd.qq.com/s/5b26z878f)
 

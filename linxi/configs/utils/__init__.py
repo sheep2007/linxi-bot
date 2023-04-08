@@ -176,8 +176,7 @@ class ConfigsManager:
             if not config:
                 config = self._data[module].configs.get(f"{key} [LEVEL]")
             if not config:
-                raise NoSuchConfig(
-                    f"未查询到配置项 MODULE: [ {module} ] | KEY: [ {key} ]")
+                raise NoSuchConfig(f"未查询到配置项 MODULE: [ {module} ] | KEY: [ {key} ]")
             if config.arg_parser:
                 value = config.arg_parser(value or config.default_value)
             else:
@@ -191,8 +190,7 @@ class ConfigsManager:
                     else:
                         if config.default_value is not None:
                             value = (
-                                cattrs.structure(
-                                    config.default_value, config.type)
+                                cattrs.structure(config.default_value, config.type)
                                 if config.type
                                 else config.default_value
                             )
@@ -293,8 +291,7 @@ class ConfigsManager:
             for module in temp_data:
                 config_group = ConfigGroup(module=module)
                 for config in temp_data[module]:
-                    config_group.configs[config] = Config(
-                        **temp_data[module][config])
+                    config_group.configs[config] = Config(**temp_data[module][config])
                     count += 1
                 self._data[module] = config_group
             logger.info(

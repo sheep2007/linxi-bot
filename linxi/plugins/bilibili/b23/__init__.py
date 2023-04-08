@@ -11,7 +11,7 @@ b23_command = on_command(
     "b站热搜",
     aliases=config.b23_commands,
     block=config.b23_block,
-    priority=config.b23_priority
+    priority=config.b23_priority,
 )
 
 
@@ -20,9 +20,7 @@ async def b23_handler(matcher: Matcher, command: str = RawCommand()):
     try:
         async with httpx.AsyncClient() as r:
             r: httpx.AsyncClient
-            res = await r.get(
-                "https://app.bilibili.com/x/v2/search/trending/ranking"
-            )
+            res = await r.get("https://app.bilibili.com/x/v2/search/trending/ranking")
             msg = f"{command}:\n"
             for index, i in enumerate(res.json().get("data", {}).get("list", [])):
                 msg += f"{index + 1}.{i['show_name']}\n"

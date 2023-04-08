@@ -21,10 +21,7 @@ __plugin_meta__ = PluginMetadata(
     name="谁艾特我",
     description="看看是谁又艾特了我",
     usage="直接发送 谁@我了？",
-    extra={
-        "unique_name": "who_at_me",
-        "example": "谁TM艾特我"
-    }
+    extra={"unique_name": "who_at_me", "example": "谁TM艾特我"},
 )
 plugin_config = Config.parse_obj(get_driver().config)
 reminder_expire_time = (

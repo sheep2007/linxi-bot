@@ -31,10 +31,7 @@ __plugin_meta__ = PluginMetadata(
     name="入群欢迎",
     description="为每个群设置不同的入群欢迎",
     usage=__plugin_usage__,
-    extra={
-        "unique_name": "welcome",
-        "example": "/设置入群欢迎 欢迎你[at]"
-    }
+    extra={"unique_name": "welcome", "example": "/设置入群欢迎 欢迎你[at]"},
 )
 
 
@@ -59,8 +56,7 @@ async def _(
             await custom_group_welcome(msg, img, event.user_id, event.group_id),
             at_sender=True,
         )
-        logger.info(
-            f"USER {event.user_id} GROUP {event.group_id} 自定义群欢迎消息：{msg}")
+        logger.info(f"USER {event.user_id} GROUP {event.group_id} 自定义群欢迎消息：{msg}")
     except Exception as e:
         logger.error(f"自定义进群欢迎消息发生错误 {type(e)}：{e}")
         await custom_welcome.send("发生了一些未知错误...")

@@ -42,5 +42,3 @@ def load_path():
 
 
 load_path()
-
-

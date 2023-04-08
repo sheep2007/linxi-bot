@@ -19,10 +19,7 @@ __plugin_meta__ = PluginMetadata(
     name="Arcaea",
     description="Arcaea查分插件",
     usage="使用 /arc help查看使用帮助",
-    extra={
-        "unique_name": "arcaea",
-        "example": "/arc help"
-    }
+    extra={"unique_name": "arcaea", "example": "/arc help"},
 )
 
 arc.handle()(pre_handler)

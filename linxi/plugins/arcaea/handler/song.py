@@ -7,7 +7,9 @@ from ..api.request import API
 from ..schema import diffstr2num
 
 
-async def song_handler(event: MessageEvent | GuildMessageEvent, arg: Message = CommandArg()):
+async def song_handler(
+    event: MessageEvent | GuildMessageEvent, arg: Message = CommandArg()
+):
     """
     /arc song Fracture Ray ftr
     """

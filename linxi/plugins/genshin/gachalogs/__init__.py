@@ -40,11 +40,9 @@ __plugin_meta__ = PluginMetadata(
 
     你可以参考使用文档中的教程获取米哈游通行证 Cookie
     """,
-    extra={
-        "unique_name": "genshin",
-        "example": "/原神 抽卡记录"
-    }
+    extra={"unique_name": "genshin", "example": "/原神 抽卡记录"},
 )
+
 
 async def _OFFLINE_FILE(bot: "rBot", event: "rEvent") -> bool:
     if isinstance(event, NoticeEvent):
@@ -62,8 +60,12 @@ async def _OFFLINE_FILE(bot: "rBot", event: "rEvent") -> bool:
 
 mainMatcher = on_command("原神 抽卡记录", aliases={"genshin log", "gs log"}, priority=5)
 aMatcher = on_command("原神 抽卡成就", aliases={"genshin success", "gs success"}, priority=5)
-eMatcher = on_command("原神 抽卡记录导出", aliases={"原神 导出抽卡记录", "genshin export", "gs export"}, priority=5)
-dMatcher = on_command("原神 抽卡记录删除", aliases={"原神 删除抽卡记录", "genshin remove", "gs remove"}, priority=5)
+eMatcher = on_command(
+    "原神 抽卡记录导出", aliases={"原神 导出抽卡记录", "genshin export", "gs export"}, priority=5
+)
+dMatcher = on_command(
+    "原神 抽卡记录删除", aliases={"原神 删除抽卡记录", "genshin remove", "gs remove"}, priority=5
+)
 fMatcher = on_notice(rule=Rule(_OFFLINE_FILE))
 
 

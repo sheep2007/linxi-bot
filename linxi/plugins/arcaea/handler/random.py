@@ -6,7 +6,9 @@ from ..message.text_message import TextMessage
 from ..api.request import API
 
 
-async def random_handler(event: MessageEvent | GuildMessageEvent, arg: Message = CommandArg()):
+async def random_handler(
+    event: MessageEvent | GuildMessageEvent, arg: Message = CommandArg()
+):
     args = arg.extract_plain_text().split()
     args = {i: v for i, v in enumerate(args)}
     if args.get(0, None) == "random" or args.get(0, None) == "rd":

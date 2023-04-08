@@ -10,7 +10,9 @@ class PluginManager:
     __path: Path
     __plugin_list: Dict[str, Dict[str, Union[str, Dict[int, int]]]]
 
-    def __init__(self, path: Path = Path() / "data" / "plugin_manage" / "plugin_group_list.yml"):
+    def __init__(
+        self, path: Path = Path() / "data" / "plugin_manage" / "plugin_group_list.yml"
+    ):
         self.__path = path
         self.__load()
 

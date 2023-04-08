@@ -10,7 +10,9 @@ from shutil import rmtree
 from typing import List, Union
 
 
-async def assets_update_handler(event: Union[MessageEvent, GuildMessageEvent], arg: Message = CommandArg()):
+async def assets_update_handler(
+    event: Union[MessageEvent, GuildMessageEvent], arg: Message = CommandArg()
+):
     args: List = arg.extract_plain_text().split()
     if args[0] == "assets_update":
         if len(args) == 2:

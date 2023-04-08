@@ -15,11 +15,17 @@ from nonebot.typing import T_State
 
 from . import approve
 from .utils import At, fi
+
 # from .func_hook import check_func_status
 
 # 查看当前群分管
-gad = on_command('分管', aliases={'gad', '分群管理', "查看分管"}, priority=1, block=True,
-                permission=GROUP_ADMIN | GROUP_OWNER | SUPERUSER)
+gad = on_command(
+    "分管",
+    aliases={"gad", "分群管理", "查看分管"},
+    priority=1,
+    block=True,
+    permission=GROUP_ADMIN | GROUP_OWNER | SUPERUSER,
+)
 
 
 @gad.handle()
@@ -30,11 +36,13 @@ async def _(bot: Bot, event: GroupMessageEvent):
         rely = str(admins[gid])
         await gad.finish(f"本群分管：{rely}")
     except KeyError:
-        await gad.finish('查询不到呢，使用 分管+@xx 来添加分管')
+        await gad.finish("查询不到呢，使用 分管+@xx 来添加分管")
 
 
 # 查看所有分管
-su_g_admin = on_command('所有分管', aliases={'sgad', '所有分群管理'}, priority=1, block=True, permission=SUPERUSER)
+su_g_admin = on_command(
+    "所有分管", aliases={"sgad", "所有分群管理"}, priority=1, block=True, permission=SUPERUSER
+)
 
 
 @su_g_admin.handle()
@@ -44,15 +52,20 @@ async def _(bot: Bot, event: MessageEvent):
 
 
 # 添加分群管理员
-g_admin = on_command('分管+', aliases={'gad+', '分群管理+'}, priority=1, block=True,
-                     permission=GROUP_ADMIN | GROUP_OWNER | SUPERUSER)
+g_admin = on_command(
+    "分管+",
+    aliases={"gad+", "分群管理+"},
+    priority=1,
+    block=True,
+    permission=GROUP_ADMIN | GROUP_OWNER | SUPERUSER,
+)
 
 
 @g_admin.handle()
 async def _(bot: Bot, matcher: Matcher, event: GroupMessageEvent, state: T_State):
     sb = At(event.json())
     gid = str(event.group_id)
-    if sb and 'all' not in sb:
+    if sb and "all" not in sb:
         for qq in sb:
             g_admin_handle = await approve.g_admin_add(gid, int(qq))
             if g_admin_handle:
@@ -60,7 +73,7 @@ async def _(bot: Bot, matcher: Matcher, event: GroupMessageEvent, state: T_State
             else:
                 await g_admin.send(f"用户{qq}已存在")
     else:
-        sb = str(state['_prefix']['command_arg']).split(' ')
+        sb = str(state["_prefix"]["command_arg"]).split(" ")
         for qq in sb:
             g_admin_handle = await approve.g_admin_add(gid, int(qq))
             if g_admin_handle:
@@ -70,18 +83,29 @@ async def _(bot: Bot, matcher: Matcher, event: GroupMessageEvent, state: T_State
 
 
 # 开启superuser接收处理结果
-su_gad = g_admin = on_command('审批接收', aliases={"审批订阅", "订阅审批", "接收审批"},priority=1, block=True, permission=SUPERUSER)
+su_gad = g_admin = on_command(
+    "审批接收",
+    aliases={"审批订阅", "订阅审批", "接收审批"},
+    priority=1,
+    block=True,
+    permission=SUPERUSER,
+)
 
 
 @su_gad.handle()
 async def _(bot: Bot, event: MessageEvent):
     status = await approve.su_on_off()
-    await su_gad.finish('已开启审批消息接收' if status else '已关闭审批消息接收')
+    await su_gad.finish("已开启审批消息接收" if status else "已关闭审批消息接收")
 
 
 # 删除分群管理
-g_admin_ = on_command('分管-', aliases={'gad-', '分群管理-'}, priority=1, block=True,
-                      permission=GROUP_ADMIN | GROUP_OWNER | SUPERUSER)
+g_admin_ = on_command(
+    "分管-",
+    aliases={"gad-", "分群管理-"},
+    priority=1,
+    block=True,
+    permission=GROUP_ADMIN | GROUP_OWNER | SUPERUSER,
+)
 
 
 @g_admin_.handle()
@@ -89,7 +113,7 @@ async def _(bot: Bot, matcher: Matcher, event: GroupMessageEvent, state: T_State
     sb = At(event.json())
     gid = str(event.group_id)
 
-    if sb and 'all' not in sb:
+    if sb and "all" not in sb:
         for qq in sb:
             g_admin_del_handle = await approve.g_admin_del(gid, int(qq))
             if g_admin_del_handle:
@@ -99,7 +123,7 @@ async def _(bot: Bot, matcher: Matcher, event: GroupMessageEvent, state: T_State
             elif g_admin_del_handle is None:
                 await g_admin_.send(f"群{gid}未添加过分群管理\n使用/gadmin+ [用户（可@ 可qq）]来添加分群管理")
     else:
-        sb = str(state['_prefix']['command_arg']).split(' ')
+        sb = str(state["_prefix"]["command_arg"]).split(" ")
         for qq in sb:
             g_admin_del_handle = await approve.g_admin_del(gid, int(qq))
             if g_admin_del_handle:

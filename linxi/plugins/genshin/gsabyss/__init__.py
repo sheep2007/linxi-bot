@@ -14,16 +14,20 @@ __plugin_meta__ = PluginMetadata(
     速览：/原神 深渊速览
     统计：/原神 深渊统计
     """,
-    extra={
-        "unique_name": "genshin",
-        "example": "/原神 深渊速览"
-    }
+    extra={"unique_name": "genshin", "example": "/原神 深渊速览"},
 )
 
 
 PRIORITY = plugin_config.gsabyss_priority
-quickview_matcher = on_command("gs 速览", aliases={"gs 深渊速览", "genshin 速览", "genshin 深渊速览", "原神 速览", "原神 深渊速览"}, priority=PRIORITY, block=True)
-totalview_matcher = on_command("gs 深渊统计", aliases={"genshin 深渊统计", "原神 深渊统计"},priority=PRIORITY, block=True)
+quickview_matcher = on_command(
+    "gs 速览",
+    aliases={"gs 深渊速览", "genshin 速览", "genshin 深渊速览", "原神 速览", "原神 深渊速览"},
+    priority=PRIORITY,
+    block=True,
+)
+totalview_matcher = on_command(
+    "gs 深渊统计", aliases={"genshin 深渊统计", "原神 深渊统计"}, priority=PRIORITY, block=True
+)
 
 
 @quickview_matcher.handle()

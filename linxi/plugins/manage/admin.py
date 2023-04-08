@@ -22,7 +22,13 @@ from .utils import At, MsgText, banSb, change_s_title, fi, log_fi, sd, Reply, lo
 
 su = global_config.superusers
 
-ban = on_command('禁', aliases={"ban"}, priority=1, block=True, permission=SUPERUSER | GROUP_ADMIN | GROUP_OWNER | DEPUTY_ADMIN)
+ban = on_command(
+    "禁",
+    aliases={"ban"},
+    priority=1,
+    block=True,
+    permission=SUPERUSER | GROUP_ADMIN | GROUP_OWNER | DEPUTY_ADMIN,
+)
 
 
 @ban.handle()
@@ -31,8 +37,14 @@ async def _(bot: Bot, matcher: Matcher, event: GroupMessageEvent):
     /禁 @user 禁言
     """
     try:
-        msg = MsgText(event.json()).replace(' ', '').replace('禁', '')
-        time = int(''.join(map(str, list(map(lambda x: int(x), filter(lambda x: x.isdigit(), msg))))))
+        msg = MsgText(event.json()).replace(" ", "").replace("禁", "")
+        time = int(
+            "".join(
+                map(
+                    str, list(map(lambda x: int(x), filter(lambda x: x.isdigit(), msg)))
+                )
+            )
+        )
         # 提取消息中所有数字作为禁言时间
     except ValueError:
         time = None
@@ -44,12 +56,18 @@ async def _(bot: Bot, matcher: Matcher, event: GroupMessageEvent):
             async for baned in baning:
                 if baned:
                     await baned
-            await log_fi(matcher, '禁言操作成功' if time is not None else '用户已被禁言随机时长')
+            await log_fi(matcher, "禁言操作成功" if time is not None else "用户已被禁言随机时长")
         except ActionFailed:
-            await fi(matcher, '权限不足')
+            await fi(matcher, "权限不足")
 
 
-unban = on_command('解', aliases={'unban'},priority=1, block=True, permission=SUPERUSER | GROUP_ADMIN | GROUP_OWNER | DEPUTY_ADMIN)
+unban = on_command(
+    "解",
+    aliases={"unban"},
+    priority=1,
+    block=True,
+    permission=SUPERUSER | GROUP_ADMIN | GROUP_OWNER | DEPUTY_ADMIN,
+)
 
 
 @unban.handle()
@@ -65,13 +83,18 @@ async def _(bot: Bot, matcher: Matcher, event: GroupMessageEvent):
             async for baned in baning:
                 if baned:
                     await baned
-            await log_fi(matcher, '解禁操作成功')
+            await log_fi(matcher, "解禁操作成功")
         except ActionFailed:
-            await fi(matcher, '权限不足')
+            await fi(matcher, "权限不足")
 
 
-ban_all = on_command('ban all', aliases={'全体禁言', "全禁", "全员禁言"}, permission=SUPERUSER | GROUP_ADMIN | GROUP_OWNER | DEPUTY_ADMIN, priority=1,
-                    block=True)
+ban_all = on_command(
+    "ban all",
+    aliases={"全体禁言", "全禁", "全员禁言"},
+    permission=SUPERUSER | GROUP_ADMIN | GROUP_OWNER | DEPUTY_ADMIN,
+    priority=1,
+    block=True,
+)
 
 
 @ban_all.handle()
@@ -82,21 +105,24 @@ async def _(bot: Bot, matcher: Matcher, event: GroupMessageEvent):
     /all  解 关闭全员禁言
     """
     msg = event.get_message()
-    if msg and '解' in str(msg):
+    if msg and "解" in str(msg):
         enable = False
     else:
         enable = True
     try:
-        await bot.set_group_whole_ban(
-            group_id=event.group_id,
-            enable=enable
-        )
+        await bot.set_group_whole_ban(group_id=event.group_id, enable=enable)
         await log_fi(matcher, f"全体操作成功: {'禁言' if enable else '解禁'}")
     except ActionFailed:
-        await fi(matcher, '权限不足')
+        await fi(matcher, "权限不足")
 
 
-change = on_command('改', aliases={"改昵称", "修改昵称"},permission=SUPERUSER | GROUP_ADMIN | GROUP_OWNER | DEPUTY_ADMIN, priority=1, block=True)
+change = on_command(
+    "改",
+    aliases={"改昵称", "修改昵称"},
+    permission=SUPERUSER | GROUP_ADMIN | GROUP_OWNER | DEPUTY_ADMIN,
+    priority=1,
+    block=True,
+)
 
 
 @change.handle()
@@ -112,16 +138,20 @@ async def _(bot: Bot, matcher: Matcher, event: GroupMessageEvent):
         try:
             for user_ in sb:
                 await bot.set_group_card(
-                    group_id=gid,
-                    user_id=int(user_),
-                    card=msg.split()[-1:][0]
+                    group_id=gid, user_id=int(user_), card=msg.split()[-1:][0]
                 )
-            await log_fi(matcher, '改名片操作成功')
+            await log_fi(matcher, "改名片操作成功")
         except ActionFailed:
-            await fi(matcher, '权限不足')
+            await fi(matcher, "权限不足")
 
 
-kick = on_command('踢', aliases={'kick'},permission=SUPERUSER | GROUP_ADMIN | GROUP_OWNER | DEPUTY_ADMIN, priority=1, block=True)
+kick = on_command(
+    "踢",
+    aliases={"kick"},
+    permission=SUPERUSER | GROUP_ADMIN | GROUP_OWNER | DEPUTY_ADMIN,
+    priority=1,
+    block=True,
+)
 
 
 @kick.handle()
@@ -132,27 +162,30 @@ async def _(bot: Bot, matcher: Matcher, event: GroupMessageEvent):
     sb = At(event.json())
     gid = event.group_id
     if sb:
-        if 'all' not in sb:
+        if "all" not in sb:
             try:
                 for qq in sb:
                     if qq == event.user_id:
-                        await sd(matcher, '你在玩一种很新的东西，不能踢自己!')
+                        await sd(matcher, "你在玩一种很新的东西，不能踢自己!")
                         continue
                     if qq in su or (str(qq) in su):
-                        await sd(matcher, '超级用户不能被踢')
+                        await sd(matcher, "超级用户不能被踢")
                         continue
                     await bot.set_group_kick(
-                        group_id=gid,
-                        user_id=int(qq),
-                        reject_add_request=False
+                        group_id=gid, user_id=int(qq), reject_add_request=False
                     )
-                await log_fi(matcher, '踢人操作执行完毕')
+                await log_fi(matcher, "踢人操作执行完毕")
             except ActionFailed:
-                await fi(matcher, '权限不足')
-        await fi(matcher, '不能含有@全体成员')
+                await fi(matcher, "权限不足")
+        await fi(matcher, "不能含有@全体成员")
 
 
-kick_ = on_command('黑', permission=SUPERUSER | GROUP_ADMIN | GROUP_OWNER | DEPUTY_ADMIN, priority=1, block=True)
+kick_ = on_command(
+    "黑",
+    permission=SUPERUSER | GROUP_ADMIN | GROUP_OWNER | DEPUTY_ADMIN,
+    priority=1,
+    block=True,
+)
 
 
 @kick_.handle()
@@ -163,33 +196,30 @@ async def _(bot: Bot, matcher: Matcher, event: GroupMessageEvent):
     sb = At(event.json())
     gid = event.group_id
     if sb:
-        if 'all' not in sb:
+        if "all" not in sb:
             try:
                 for qq in sb:
                     if qq == event.user_id:
-                        await sd(matcher, '你在玩一种很新的东西，不能踢自己!')
+                        await sd(matcher, "你在玩一种很新的东西，不能踢自己!")
                         continue
                     if qq in su or (str(qq) in su):
-                        await sd(matcher, '超级用户不能被踢')
+                        await sd(matcher, "超级用户不能被踢")
                         continue
                     await bot.set_group_kick(
-                        group_id=gid,
-                        user_id=int(qq),
-                        reject_add_request=True
+                        group_id=gid, user_id=int(qq), reject_add_request=True
                     )
-                await log_fi(matcher, '踢人并拉黑操作执行完毕')
+                await log_fi(matcher, "踢人并拉黑操作执行完毕")
             except ActionFailed:
-                await fi(matcher, '权限不足')
-        await fi(matcher, '不能含有@全体成员')
-
+                await fi(matcher, "权限不足")
+        await fi(matcher, "不能含有@全体成员")
 
 
 set_essence = on_command(
     "加精",
-    aliases={'加精', 'set_essence', "设精", "设为精华"},
+    aliases={"加精", "set_essence", "设精", "设为精华"},
     priority=5,
     block=True,
-    permission=SUPERUSER | GROUP_ADMIN | GROUP_OWNER | DEPUTY_ADMIN
+    permission=SUPERUSER | GROUP_ADMIN | GROUP_OWNER | DEPUTY_ADMIN,
 )
 
 
@@ -197,16 +227,16 @@ set_essence = on_command(
 async def _(bot: Bot, event: GroupMessageEvent):
     rp = Reply(event.json())
     if rp:
-        msg_id = rp['message_id']
-        await bot.call_api(api='set_essence_msg', message_id=msg_id)
+        msg_id = rp["message_id"]
+        await bot.call_api(api="set_essence_msg", message_id=msg_id)
 
 
 del_essence = on_command(
     "取消精华",
-    aliases={'取消加精', 'del_essence'},
+    aliases={"取消加精", "del_essence"},
     priority=5,
     block=True,
-    permission=SUPERUSER | GROUP_ADMIN | GROUP_OWNER | DEPUTY_ADMIN
+    permission=SUPERUSER | GROUP_ADMIN | GROUP_OWNER | DEPUTY_ADMIN,
 )
 
 
@@ -214,10 +244,14 @@ del_essence = on_command(
 async def _(bot: Bot, event: GroupMessageEvent):
     rp = Reply(event.json())
     if rp:
-        msg_id = rp['message_id']
-        await bot.call_api(api='delete_essence_msg', message_id=msg_id)
+        msg_id = rp["message_id"]
+        await bot.call_api(api="delete_essence_msg", message_id=msg_id)
 
-exit = on_command("退群", aliases={"exit"}, priority=5, block=True, permission=SUPERUSER | GROUP_OWNER)
+
+exit = on_command(
+    "退群", aliases={"exit"}, priority=5, block=True, permission=SUPERUSER | GROUP_OWNER
+)
+
 
 @exit.handle()
 async def _(bot: Bot, event: GroupMessageEvent):
