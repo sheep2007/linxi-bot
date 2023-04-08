@@ -1,10 +1,11 @@
-from nonebot import on_message, get_driver
-from nonebot.typing import Union
+import re
+from typing import Union
+from nonebot import on_message
 from nonebot.plugin import PluginMetadata
 from nonebot.adapters.onebot.v11 import MessageEvent, Message
 # 适配频道，不需要可自行注释
 from nonebot_plugin_guild_patch import Message, GuildMessageEvent
-import re
+
 from .data_source import get_github_reposity_information
 
 
@@ -19,8 +20,8 @@ __plugin_meta__ = PluginMetadata(
     }
 )
 
-github = on_message(priority=5)
 
+github = on_message(priority=5)
 
 @github.handle()
 async def github_handle(event: Union[MessageEvent, GuildMessageEvent]):
