@@ -22,7 +22,7 @@ __plugin_meta__ = PluginMetadata(
 )
 
 
-github = on_message(priority=5)
+github = on_message(priority=99)
 
 
 @github.handle()
@@ -30,7 +30,11 @@ async def github_handle(event: Union[MessageEvent, GuildMessageEvent]):
     url = event.get_plaintext()
     if re.match("https://github.com/.*?/.*?", url) != None:
         imageUrl = await get_github_reposity_information(url)
-        assert imageUrl != "获取信息失败"
-        await github.finish(Message(f"[CQ:image,file={imageUrl}]"))
-        # ↓网页截图↓
-        # await github.finish(Message(f"[CQ:image,file=https://image.thum.io/get/width/1280/crop/1440/viewportWidth/1280/png/noanimate/{url}]"))
+        if imageUrl != "获取信息失败":
+            await github.finish(
+                Message(
+                    f"[CQ:image,file=https://image.thum.io/get/width/1280/crop/1440/viewportWidth/1280/png/noanimate/{url}]"
+                )
+            )
+        else:
+            await github.finish(Message(f"[CQ:image,file={imageUrl}]"))
